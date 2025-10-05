@@ -22,6 +22,7 @@ Hệ thống core multitenant được thiết kế để dễ dàng mở rộng
 - **Job Scheduler:** Job
 - **Quản lý môi trường:** env
 - **Xác thực:** OAuth
+- **chuyển đổi YAML/JSON** yq
 
 #### Frontend
 
