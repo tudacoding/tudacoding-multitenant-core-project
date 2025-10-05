@@ -1,0 +1,81 @@
+networks:
+  multitenant_network:
+    driver: bridge
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: multitenant_backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_NAME: multitenant_db
+      DATABASE_PASSWORD: postgres123
+      DATABASE_PORT: "5432"
+      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/multitenant_db
+      DATABASE_USER: postgres
+      NODE_ENV: development
+      PORT: "3000"
+    healthcheck:
+      interval: 30s
+      retries: "3"
+      start_period: 40s
+      test:
+        - CMD-SHELL
+        - 'node -e "require(''http'').get(''http://localhost:3000/health'', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"'
+      timeout: 10s
+    networks:
+      - multitenant_network
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+  pgadmin:
+    container_name: multitenant_pgadmin
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_DEFAULT_EMAIL: admin@multitenant.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    image: dpage/pgadmin4:latest
+    networks:
+      - multitenant_network
+    ports:
+      - 5050:80
+    restart: unless-stopped
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+  postgres:
+    container_name: multitenant_postgres
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: multitenant_db
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_USER: postgres
+    healthcheck:
+      interval: 10s
+      retries: "5"
+      test:
+        - CMD-SHELL
+        - pg_isready -U postgres -d multitenant_db
+      timeout: 5s
+    image: postgres:15-alpine
+    networks:
+      - multitenant_network
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+volumes:
+  pgadmin_data:
+    driver: local
+  postgres_data:
+    driver: local

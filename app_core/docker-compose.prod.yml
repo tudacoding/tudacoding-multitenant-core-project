@@ -5,7 +5,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     container_name: multitenant_backend
     depends_on:
       postgres:
