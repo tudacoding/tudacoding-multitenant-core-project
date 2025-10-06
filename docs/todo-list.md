@@ -1,0 +1,13 @@
+- [x] Connect database
+- [x] Setup Project Frontend
+- [] Setup docker cho frontend
+- [] Deploy on Google Cloud
+- [] GraphQL send message
+- [] Design Multitenant Layer
+- [] Scaling K8s + HPA
+- [] Authentication & Authorization
+- [] Setup Oauth Google + Facebook
+- [] Apply for multitenant
+- [] Design super admin site
+- [] Design admin site
+- [] Design landing site
